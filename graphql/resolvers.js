@@ -124,4 +124,27 @@ module.exports = {
       updatedAt: createdPost.updatedAt.toISOString(),
     };
   },
+  posts: async (args, req) => {
+    if (!req.isAuth) {
+      const error = new Error('Unauthorized to get posts');
+      error.code = 401;
+      throw error;
+    }
+    const totalPosts = await Post.find().countDocuments();
+    const posts = await Post.find()
+      .populate('creator')
+      .sort({ createdAt: 'desc' });
+
+    return {
+      posts: posts.map((p) => {
+        return {
+          ...p._doc,
+          _id: p._id.toString(),
+          createdAt: p.createdAt.toISOString(),
+          updatedAt: p.updatedAt.toISOString(),
+        };
+      }),
+      totalPosts,
+    };
+  },
 };
