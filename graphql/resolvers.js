@@ -124,16 +124,22 @@ module.exports = {
       updatedAt: createdPost.updatedAt.toISOString(),
     };
   },
-  posts: async (args, req) => {
+  posts: async ({ page }, req) => {
     if (!req.isAuth) {
       const error = new Error('Unauthorized to get posts');
       error.code = 401;
       throw error;
     }
+    if (!page) {
+      page = 1;
+    }
+    const perPage = 2;
     const totalPosts = await Post.find().countDocuments();
     const posts = await Post.find()
-      .populate('creator')
-      .sort({ createdAt: 'desc' });
+      .sort({ createdAt: 'desc' })
+      .skip((page - 1) * perPage)
+      .limit(perPage)
+      .populate('creator');
 
     return {
       posts: posts.map((p) => {
