@@ -2,6 +2,7 @@ const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const SECRET_KEY = process.env.JWT_SECRET;
+const LIFE_TIME = process.env.JWT_TOKEN_LIFE_TIME;
 
 const User = require('../models/user');
 
@@ -68,7 +69,7 @@ exports.login = async (req, res, next) => {
       },
       SECRET_KEY,
       {
-        expiresIn: '1h',
+        expiresIn: LIFE_TIME,
       }
     );
 
